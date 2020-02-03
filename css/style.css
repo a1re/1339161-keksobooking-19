@@ -1249,3 +1249,8 @@ fieldset {
   outline: none;
   opacity: 0.6;
 }
+
+.invalid {
+  border-color: #d80505 !important;
+  background-color: #ffe4e4 !important;
+}
