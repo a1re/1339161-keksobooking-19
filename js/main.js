@@ -303,6 +303,26 @@ var updateFieldValidity = function (field, isValid, invalidMessage) {
   }
 };
 
+var checkPriceValue = function () {
+  var price = parseInt(priceInput.value);
+  var maxPrice = parseInt(priceInput.max);
+  var minPrice = getMinPrice();
+  if (isNaN(price) || price > maxPrice || price < minPrice) {
+    priceInput.classList.add('invalid');
+    return
+  }
+  priceInput.classList.remove('invalid');
+}
+
+var getMinPrice = function () {
+  var typeValue = typeSelector.value;
+  var typeIndex = ACCOMODATION_TYPES.indexOf(typeValue);
+  if (typeIndex === -1) {
+    return 0;
+  }
+  return ACCOMODATION_TYPES_MIN_PRICES[typeIndex];
+}
+
 mainPin.addEventListener('mousedown', function (evt) {
   if (evt.button === MOUSE_MAIN_BUTTON) {
     activatePage();
@@ -329,12 +349,14 @@ roomNumberSelector.addEventListener('change', function () {
 });
 
 typeSelector.addEventListener('change', function () {
-  var typeValue = typeSelector.value;
-  var typeIndex = ACCOMODATION_TYPES.indexOf(typeValue);
-  if (typeIndex >= 0) {
-    priceInput.min = ACCOMODATION_TYPES_MIN_PRICES[typeIndex];
-    priceInput.placeholder = ACCOMODATION_TYPES_MIN_PRICES[typeIndex];
-  }
+  var minPrice = getMinPrice();
+  priceInput.min = minPrice;
+  priceInput.placeholder = minPrice;
+  checkPriceValue();
+});
+
+priceInput.addEventListener('change', function () {
+  checkPriceValue();
 });
 
 mainPin.addEventListener('click', function () {
