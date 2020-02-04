@@ -2,6 +2,7 @@
 
 var ACCOMODATION_TYPES = ['palace', 'flat', 'house', 'bungalo'];
 var ACCOMODATION_TYPES_RU = ['Дворец', 'Квартира', 'Дом', 'Бунгало'];
+var ACCOMODATION_TYPES_MIN_PRICES = [10000, 1000, 5000, 0];
 var CHECKIN_CHECKOUT_SLOTS = ['12:00', '13:00', '14:00'];
 var FEATURES_LIST = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var PHOTOS_LIST = [
@@ -26,6 +27,8 @@ var mainPin = mapElement.querySelector('.map__pin--main');
 var adForm = document.querySelector('.ad-form');
 var capacitySelector = adForm.querySelector('#capacity');
 var roomNumberSelector = adForm.querySelector('#room_number');
+var typeSelector = adForm.querySelector('#type');
+var priceInput = adForm.querySelector('#price');
 
 var getNaturalRandom = function (min, max) {
   var randomInt = min + Math.random() * (max + 1 - min);
@@ -322,6 +325,15 @@ roomNumberSelector.addEventListener('change', function () {
     updateFieldValidity(capacitySelector, true);
   } else {
     updateFieldValidity(roomNumberSelector, false, CAPACITY_ERROR_MESSAGE);
+  }
+});
+
+typeSelector.addEventListener('change', function () {
+  var typeValue = typeSelector.value;
+  var typeIndex = ACCOMODATION_TYPES.indexOf(typeValue);
+  if (typeIndex >= 0) {
+    priceInput.min = ACCOMODATION_TYPES_MIN_PRICES[typeIndex];
+    priceInput.placeholder = ACCOMODATION_TYPES_MIN_PRICES[typeIndex];
   }
 });
 
