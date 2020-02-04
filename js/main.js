@@ -194,8 +194,8 @@ var openCard = function (pinDetails) {
   fillOrHideElement(card.querySelector('.popup__text--time'), checkinCheckout.length, capitlizeFirstLetter(checkinCheckout.join(', ')));
   fillOrHideElement(card.querySelector('.popup__type'), pinDetails.offer.type, ACCOMODATION_TYPES_RU[ACCOMODATION_TYPES.indexOf(pinDetails.offer.type)]);
   fillOrHideElement(card.querySelector('.popup__text--capacity'), roomsGuests.length, capitlizeFirstLetter(roomsGuests.join(' ')));
-  
-  card.querySelector('.popup__close').addEventListener('click', function (){
+
+  card.querySelector('.popup__close').addEventListener('click', function () {
     closeCard(card);
   });
   document.addEventListener('keydown', closeCardByEscHandler);
@@ -216,7 +216,7 @@ var placePins = function (pinList) {
   var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
   var allPins = document.createDocumentFragment();
   for (var i = 0; i < pinList.length; i++) {
-    var pin = allPins.appendChild( makePin(pinTemplate.cloneNode(true), pinList[i]) );
+    var pin = allPins.appendChild(makePin(pinTemplate.cloneNode(true), pinList[i]));
     pin.dataset.id = i;
     pin.addEventListener('click', function (evt) {
       openCard(pinList[evt.currentTarget.dataset.id]);
@@ -306,15 +306,15 @@ var updateFieldValidity = function (field, isValid, invalidMessage) {
 };
 
 var checkPriceValue = function () {
-  var price = parseInt(priceInput.value);
-  var maxPrice = parseInt(priceInput.max);
+  var price = parseInt(priceInput.value, 10);
+  var maxPrice = parseInt(priceInput.max, 10);
   var minPrice = getMinPrice();
   if (isNaN(price) || price > maxPrice || price < minPrice) {
     priceInput.classList.add('invalid');
-    return
+    return;
   }
   priceInput.classList.remove('invalid');
-}
+};
 
 var getMinPrice = function () {
   var typeValue = typeSelector.value;
@@ -323,7 +323,7 @@ var getMinPrice = function () {
     return 0;
   }
   return ACCOMODATION_TYPES_MIN_PRICES[typeIndex];
-}
+};
 
 mainPin.addEventListener('mousedown', function (evt) {
   if (evt.button === MOUSE_MAIN_BUTTON) {
@@ -373,7 +373,6 @@ timeinSelector.addEventListener('change', function () {
 timeoutSelector.addEventListener('change', function () {
   timeinSelector.value = timeoutSelector.value;
 });
-
 
 placePins(makeData(8));
 
