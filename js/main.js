@@ -29,6 +29,8 @@ var capacitySelector = adForm.querySelector('#capacity');
 var roomNumberSelector = adForm.querySelector('#room_number');
 var typeSelector = adForm.querySelector('#type');
 var priceInput = adForm.querySelector('#price');
+var timeinSelector = adForm.querySelector('#timein');
+var timeoutSelector = adForm.querySelector('#timeout');
 
 var getNaturalRandom = function (min, max) {
   var randomInt = min + Math.random() * (max + 1 - min);
@@ -363,6 +365,15 @@ mainPin.addEventListener('click', function () {
   activatePage();
   updateAddress();
 });
+
+timeinSelector.addEventListener('change', function () {
+  timeoutSelector.value = timeinSelector.value;
+});
+
+timeoutSelector.addEventListener('change', function () {
+  timeinSelector.value = timeoutSelector.value;
+});
+
 
 placePins(makeData(8));
 
