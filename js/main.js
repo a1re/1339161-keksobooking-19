@@ -18,6 +18,7 @@ var TITLE_SECOND_WORD = ['гнездышко', 'убежище', 'местечк
 var MOUSE_MAIN_BUTTON = 0;
 var MAX_ROOMS = 100;
 var MIN_CAPACITY = 0;
+var ESC_KEY = 'Escape';
 var CAPACITY_ERROR_MESSAGE = 'Гостям будет некомфортно';
 
 var mapElement = document.querySelector('.map');
@@ -108,7 +109,23 @@ var pickWordByInt = function (n, wordforms) {
   return wordforms[2];
 };
 
+var closeCardByEscHandler = function (evt) {
+  if (evt.key === ESC_KEY) {
+    closeCard();
+  }
+};
+
+var closeCard = function () {
+  var card = document.querySelector('.map__card');
+  if (card) {
+    card.remove();
+    document.removeEventListener('keydown', closeCardByEscHandler);
+  }
+};
+
 var openCard = function (pinDetails) {
+  closeCard();
+
   var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
   var card = cardTemplate.cloneNode(true);
   var mapFilters = document.querySelector('.map__filters-container');
@@ -172,6 +189,11 @@ var openCard = function (pinDetails) {
   fillOrHideElement(card.querySelector('.popup__text--time'), checkinCheckout.length, capitlizeFirstLetter(checkinCheckout.join(', ')));
   fillOrHideElement(card.querySelector('.popup__type'), pinDetails.offer.type, ACCOMODATION_TYPES_RU[ACCOMODATION_TYPES.indexOf(pinDetails.offer.type)]);
   fillOrHideElement(card.querySelector('.popup__text--capacity'), roomsGuests.length, capitlizeFirstLetter(roomsGuests.join(' ')));
+  
+  card.querySelector('.popup__close').addEventListener('click', function (){
+    closeCard(card);
+  });
+  document.addEventListener('keydown', closeCardByEscHandler);
 
   mapFilters.parentNode.insertBefore(card, mapFilters);
 };
@@ -189,8 +211,11 @@ var placePins = function (pinList) {
   var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
   var allPins = document.createDocumentFragment();
   for (var i = 0; i < pinList.length; i++) {
-    var pin = makePin(pinTemplate.cloneNode(true), pinList[i]);
-    allPins.appendChild(pin);
+    var pin = allPins.appendChild( makePin(pinTemplate.cloneNode(true), pinList[i]) );
+    pin.dataset.id = i;
+    pin.addEventListener('click', function (evt) {
+      openCard(pinList[evt.currentTarget.dataset.id]);
+    });
   }
   document.querySelector('.map__pins').appendChild(allPins);
 };
