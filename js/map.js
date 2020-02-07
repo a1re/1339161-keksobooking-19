@@ -48,6 +48,8 @@ window.map = (function () {
     }
   });
 
+  window.pin.makeDraggable(window.pin.master);
+
   placePins(window.data.getPins(8));
 
   window.form.deactivate();

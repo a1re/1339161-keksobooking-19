@@ -39,10 +39,50 @@ window.pin = (function () {
     return coords.x + ', ' + coords.y;
   };
 
+  var makeDraggable = function (draggableElement) {
+
+    draggableElement.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+
+      var startCoords = {
+        x: evt.clientX,
+        y: evt.clientY
+      };
+
+      var mouseMoveHandler = function (moveEvt) {
+        moveEvt.preventDefault();
+
+        var delta = {
+          x: startCoords.x - moveEvt.clientX,
+          y: startCoords.y - moveEvt.clientY,
+        };
+
+        startCoords = {
+          x: moveEvt.clientX,
+          y: moveEvt.clientY
+        };
+
+        draggableElement.style.left = (draggableElement.offsetLeft - delta.x) + 'px';
+        draggableElement.style.top = (draggableElement.offsetTop - delta.y) + 'px';
+      };
+
+      var mouseUpHandler = function (upEvt) {
+        upEvt.preventDefault();
+
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+      };
+
+      document.addEventListener('mousemove', mouseMoveHandler);
+      document.addEventListener('mouseup', mouseUpHandler);
+    });
+  };
+
   return {
     make: make,
     master: master,
     getMasterPosition: getMasterPosition,
-    getMasterAddress: getMasterAddress
+    getMasterAddress: getMasterAddress,
+    makeDraggable: makeDraggable
   };
 })();
