@@ -10,11 +10,11 @@ window.data = (function () {
   ];
   var TITLE_FIRST_WORD = ['Очаровательное', 'Добротное', 'Милое', 'Удобное', 'Надежное'];
   var TITLE_SECOND_WORD = ['гнездышко', 'убежище', 'местечко', 'жилище'];
-  var PIN_AREA_BORDERS = {
-    top: 130,
-    right: document.querySelector('.map').offsetWidth - 50,
-    bottom: 630,
-    left: 0
+  var BOUNDARIES = {
+    TOP: 130,
+    RIGHT: document.querySelector('.map').offsetWidth,
+    BOTTOM: 630,
+    LEFT: 0
   };
   var ACCOMODATION_TYPES = [
     {
@@ -53,8 +53,8 @@ window.data = (function () {
     for (var j = 0; j < number; j++) {
       var avatarNumber = (j < 9) ? ('0' + (j + 1)) : j + 1;
       var coords = {
-        x: window.util.getNaturalRandom(PIN_AREA_BORDERS.left, PIN_AREA_BORDERS.right),
-        y: window.util.getNaturalRandom(PIN_AREA_BORDERS.top, PIN_AREA_BORDERS.bottom)
+        x: window.util.getNaturalRandom(BOUNDARIES.LEFT, BOUNDARIES.RIGHT),
+        y: window.util.getNaturalRandom(BOUNDARIES.TOP, BOUNDARIES.BOTTOM)
       };
 
       var randomHeader = window.util.getRandomValueFromArray(TITLE_FIRST_WORD)
@@ -85,6 +85,7 @@ window.data = (function () {
 
   return {
     getPins: getPins,
-    getAccomodationTypeByKey: getAccomodationTypeByKey
+    getAccomodationTypeByKey: getAccomodationTypeByKey,
+    BOUNDARIES: BOUNDARIES
   };
 })();

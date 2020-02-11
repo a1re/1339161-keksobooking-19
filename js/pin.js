@@ -7,6 +7,7 @@ window.pin = (function () {
   var MASTER_PIN_PILLAR_SIZE = 20;
 
   var master = document.querySelector('.map__pin--main');
+  var addressUpdateCallback = null;
 
   var make = function (pinElement, pinData) {
     var pinImage = pinElement.querySelector('img');
@@ -17,72 +18,68 @@ window.pin = (function () {
     return pinElement;
   };
 
-  var getMasterPosition = function (usePillar) {
-    var coords = {
-      x: parseInt(master.style.left, 10),
-      y: parseInt(master.style.top, 10)
+  var setAddressUpdateCallback = function (callback) {
+    addressUpdateCallback = callback;
+  };
+
+  master.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    var startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
     };
-    coords.x += Math.round(MASTER_PIN_SIZE / 2);
 
-    if (usePillar) {
-      coords.y += MASTER_PIN_SIZE;
-      coords.y += MASTER_PIN_PILLAR_SIZE;
-    } else {
-      coords.y += Math.round(MASTER_PIN_SIZE / 2);
-    }
+    var mouseMoveHandler = function (moveEvt) {
+      moveEvt.preventDefault();
 
-    return coords;
-  };
-
-  var getMasterAddress = function (usePillar) {
-    var coords = getMasterPosition(usePillar);
-    return coords.x + ', ' + coords.y;
-  };
-
-  var makeDraggable = function (draggableElement) {
-
-    draggableElement.addEventListener('mousedown', function (evt) {
-      evt.preventDefault();
-
-      var startCoords = {
-        x: evt.clientX,
-        y: evt.clientY
+      var delta = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY,
       };
 
-      var mouseMoveHandler = function (moveEvt) {
-        moveEvt.preventDefault();
-
-        var delta = {
-          x: startCoords.x - moveEvt.clientX,
-          y: startCoords.y - moveEvt.clientY,
-        };
-
-        startCoords = {
-          x: moveEvt.clientX,
-          y: moveEvt.clientY
-        };
-
-        draggableElement.style.left = (draggableElement.offsetLeft - delta.x) + 'px';
-        draggableElement.style.top = (draggableElement.offsetTop - delta.y) + 'px';
+      startCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
       };
 
-      var mouseUpHandler = function (upEvt) {
-        upEvt.preventDefault();
+      if (master.offsetLeft - delta.x <= window.data.BOUNDARIES.LEFT) {
+        master.style.left = window.data.BOUNDARIES.LEFT + 'px';
+      } else if (master.offsetLeft - delta.x >= (window.data.BOUNDARIES.RIGHT - MASTER_PIN_SIZE)) {
+        master.style.left = (window.data.BOUNDARIES.RIGHT - MASTER_PIN_SIZE) + 'px';
+      } else {
+        master.style.left = (master.offsetLeft - delta.x) + 'px';
+      }
 
-        document.removeEventListener('mousemove', mouseMoveHandler);
-        document.removeEventListener('mouseup', mouseUpHandler);
-      };
+      if (master.offsetTop - delta.y <= window.data.BOUNDARIES.TOP - MASTER_PIN_SIZE - MASTER_PIN_PILLAR_SIZE) {
+        master.style.top = (window.data.BOUNDARIES.TOP - MASTER_PIN_SIZE - MASTER_PIN_PILLAR_SIZE) + 'px';
+      } else if (master.offsetTop - delta.y >= window.data.BOUNDARIES.BOTTOM - MASTER_PIN_SIZE - MASTER_PIN_PILLAR_SIZE) {
+        master.style.top = (window.data.BOUNDARIES.BOTTOM - MASTER_PIN_SIZE - MASTER_PIN_PILLAR_SIZE) + 'px';
+      } else {
+        master.style.top = (master.offsetTop - delta.y) + 'px';
+      }
 
-      document.addEventListener('mousemove', mouseMoveHandler);
-      document.addEventListener('mouseup', mouseUpHandler);
-    });
-  };
+      if (typeof addressUpdateCallback === 'function') {
+        addressUpdateCallback();
+      }
+    };
+
+    var mouseUpHandler = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    };
+
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  });
 
   return {
     make: make,
     master: master,
-    getMasterPosition: getMasterPosition,
-    getMasterAddress: getMasterAddress,
-    makeDraggable: makeDraggable
+    MASTER_PIN_SIZE: MASTER_PIN_SIZE,
+    MASTER_PIN_PILLAR_SIZE: MASTER_PIN_PILLAR_SIZE,
+    setAddressUpdateCallback: setAddressUpdateCallback
   };
 })();

@@ -29,8 +29,8 @@ window.form = (function () {
     }
   };
 
-  var updateAddress = function (newAddress) {
-    adForm.querySelector('#address').value = newAddress;
+  var setAddress = function (address) {
+    adForm.querySelector('#address').value = address;
   };
 
   var checkRoomsAndCapacity = function () {
@@ -112,6 +112,6 @@ window.form = (function () {
   return {
     activate: activate,
     deactivate: deactivate,
-    updateAddress: updateAddress
+    setAddress: setAddress
   };
 })();
