@@ -68,7 +68,7 @@ window.map = (function () {
     }
   });
 
-  placePins(window.data.getPins(8));
+  window.data.getPins(placePins);
 
   window.form.deactivate();
   filters.deactivate();
