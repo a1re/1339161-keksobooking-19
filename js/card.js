@@ -61,6 +61,8 @@ window.card = (function () {
         currentPhotos.removeChild(currentPhotos.firstChild);
       }
       card.querySelector('.popup__photos').appendChild(photosFragment);
+    } else {
+      card.querySelector('.popup__photos').style.display = 'none';
     }
 
     var accomodationType = window.data.getAccomodationTypeByKey(pinDetails.offer.type);

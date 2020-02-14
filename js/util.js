@@ -53,7 +53,7 @@ window.util = (function () {
       return (evt.button === MOUSE_MAIN_BUTTON) ? true : false;
     },
     capitlizeFirstLetter: function (string) {
-      return string[0].toUpperCase() + string.slice(1);
+      return (string.length > 0) ? (string[0].toUpperCase() + string.slice(1)) : '';
     },
     getNaturalRandom: getNaturalRandom,
     getRandomValueFromArray: getRandomValueFromArray,
