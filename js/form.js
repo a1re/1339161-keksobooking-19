@@ -29,6 +29,11 @@ window.form = (function () {
     }
   };
 
+  var reset = function () {
+    deactivate();
+    setTimeout(window.pin.resetMasterPosition, 1);
+  };
+
   var setAddress = function (address) {
     adForm.querySelector('#address').value = address;
   };
@@ -108,6 +113,8 @@ window.form = (function () {
   timeoutSelector.addEventListener('change', function () {
     timeinSelector.value = timeoutSelector.value;
   });
+
+  adForm.addEventListener('reset', reset);
 
   return {
     activate: activate,

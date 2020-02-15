@@ -8,6 +8,8 @@ window.pin = (function () {
 
   var master = document.querySelector('.map__pin--main');
   var addressUpdateCallback = null;
+  var masterDefaultLeft = parseInt(master.style.left, 10);
+  var masterDefaultTop = parseInt(master.style.top, 10);
 
   var make = function (pinElement, pinData) {
     var pinImage = pinElement.querySelector('img');
@@ -22,7 +24,16 @@ window.pin = (function () {
     addressUpdateCallback = callback;
   };
 
-  master.addEventListener('mousedown', function (evt) {
+  var resetMasterPosition = function () {
+    master.style.left = masterDefaultLeft + 'px';
+    master.style.top = masterDefaultTop + 'px';
+
+    if (typeof addressUpdateCallback === 'function') {
+      addressUpdateCallback();
+    }
+  };
+
+  var updateMasterPosition = function (evt) {
     evt.preventDefault();
 
     var startCoords = {
@@ -73,13 +84,16 @@ window.pin = (function () {
 
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
-  });
+  };
+
+  master.addEventListener('mousedown', updateMasterPosition);
 
   return {
-    make: make,
-    master: master,
     MASTER_PIN_SIZE: MASTER_PIN_SIZE,
     MASTER_PIN_PILLAR_SIZE: MASTER_PIN_PILLAR_SIZE,
-    setAddressUpdateCallback: setAddressUpdateCallback
+    make: make,
+    master: master,
+    setAddressUpdateCallback: setAddressUpdateCallback,
+    resetMasterPosition: resetMasterPosition
   };
 })();

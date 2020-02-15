@@ -59,7 +59,10 @@ window.map = (function () {
   };
 
   window.pin.master.addEventListener('click', function () {
-    activatePage();
+    if (!isPageActive) {
+      activatePage();
+    }
+    updateAddress();
   });
 
   window.pin.master.addEventListener('mousedown', function (evt) {
