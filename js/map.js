@@ -58,6 +58,12 @@ window.map = (function () {
     isPageActive = true;
   };
 
+  var deactivatePage = function () {
+    mapElement.classList.add('map--faded');
+    filters.deactivate();
+    isPageActive = false;
+  };
+
   window.pin.master.addEventListener('click', function () {
     if (!isPageActive) {
       activatePage();
@@ -72,7 +78,7 @@ window.map = (function () {
   });
 
   window.data.getPins(placePins);
-
+  window.form.setDeactivationCallback(deactivatePage);
   window.form.deactivate();
   filters.deactivate();
   updateAddress();
