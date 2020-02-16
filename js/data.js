@@ -72,6 +72,7 @@ window.data = (function () {
   return {
     getPins: getPins,
     getAccomodationTypeByKey: getAccomodationTypeByKey,
-    BOUNDARIES: BOUNDARIES
+    BOUNDARIES: BOUNDARIES,
+    XHR_TIMEOUT_IN_SEC: XHR_TIMEOUT_IN_SEC
   };
 })();
