@@ -17,21 +17,6 @@ window.map = (function () {
     document.querySelector('.map__pins').appendChild(allPins);
   };
 
-  var filters = {
-    deactivate: function () {
-      var filtersList = document.querySelectorAll('.map__filters select, .map__filters fieldset');
-      for (var i = 0; i < filtersList.length; i++) {
-        filtersList[i].disabled = true;
-      }
-    },
-    activate: function () {
-      var filtersList = document.querySelectorAll('.map__filters select, .map__filters fieldset');
-      for (var i = 0; i < filtersList.length; i++) {
-        filtersList[i].disabled = false;
-      }
-    }
-  };
-
   var updateAddress = function () {
     var coords = {
       x: parseInt(window.pin.master.style.left, 10),
@@ -53,14 +38,14 @@ window.map = (function () {
   var activatePage = function () {
     mapElement.classList.remove('map--faded');
     window.form.activate();
-    filters.activate();
+    window.filter.activate();
     window.pin.setAddressUpdateCallback(updateAddress);
     isPageActive = true;
   };
 
   var deactivatePage = function () {
     mapElement.classList.add('map--faded');
-    filters.deactivate();
+    window.filter.deactivate();
     isPageActive = false;
   };
 
@@ -80,6 +65,6 @@ window.map = (function () {
   window.data.load(placePins, window.popup.error);
   window.form.setDeactivationCallback(deactivatePage);
   window.form.deactivate();
-  filters.deactivate();
+  window.filter.deactivate();
   updateAddress();
 })();
