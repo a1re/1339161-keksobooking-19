@@ -1,20 +1,32 @@
 'use strict';
 
 window.map = (function () {
+  var MAX_PINS = 5;
+
   var mapElement = document.querySelector('.map');
+  var pinHolder = document.querySelector('.map__pins');
   var isPageActive = false;
 
-  var placePins = function (pinList) {
+  var updatePins = function (pinList) {
+    var oldPins = pinHolder.querySelectorAll('.map__pin:not(.map__pin--main)');
+    oldPins.forEach(function (oldPin) {
+      oldPin.remove();
+    });
+
+    var newPins = document.createDocumentFragment();
     var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-    var allPins = document.createDocumentFragment();
-    for (var i = 0; i < pinList.length; i++) {
-      var pin = allPins.appendChild(window.pin.make(pinTemplate.cloneNode(true), pinList[i]));
-      pin.dataset.id = i;
-      pin.addEventListener('click', function (evt) {
-        window.card.open(pinList[evt.currentTarget.dataset.id]);
+    pinList.forEach(function (pinData, i) {
+      if (i >= MAX_PINS) {
+        return;
+      }
+
+      var pin = newPins.appendChild(window.pin.make(pinTemplate.cloneNode(true), pinData));
+      pin.addEventListener('click', function () {
+        window.card.open(pinData);
       });
-    }
-    document.querySelector('.map__pins').appendChild(allPins);
+    });
+    pinHolder.appendChild(newPins);
+    window.card.close();
   };
 
   var updateAddress = function () {
@@ -62,9 +74,10 @@ window.map = (function () {
     }
   });
 
-  window.data.load(placePins, window.popup.error);
+  window.data.load(updatePins, window.popup.error);
   window.form.setDeactivationCallback(deactivatePage);
   window.form.deactivate();
   window.filter.deactivate();
+  window.filter.addPinHandler(window.util.debounce(updatePins));
   updateAddress();
 })();

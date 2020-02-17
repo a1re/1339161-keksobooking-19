@@ -25,8 +25,8 @@ window.data = (function () {
     xhr.addEventListener('load', function () {
       switch (xhr.status) {
         case StatusCode.SUCCESS:
-          pins = xhr.response;
-          loadHander(pins);
+          window.data.pins = xhr.response;
+          loadHander(window.data.pins);
           break;
 
         default:

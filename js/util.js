@@ -3,7 +3,7 @@
 window.util = (function () {
   var ESC_KEYCODE = 27;
   var MOUSE_MAIN_BUTTON = 0;
-  var DEBOUNCE_INTERVAL_IN_MS = 500;
+  var DEBOUNCE_INTERVAL_IN_MS = 300;
 
   var getNaturalRandom = function (min, max) {
     var randomInt = min + Math.random() * (max + 1 - min);
