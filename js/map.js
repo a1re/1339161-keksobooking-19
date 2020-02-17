@@ -38,13 +38,13 @@ window.map = (function () {
       y: parseInt(window.pin.master.style.top, 10)
     };
 
-    coords.x += Math.round(window.pin.MASTER_PIN_SIZE / 2);
+    coords.x += Math.round(window.pin.MasterPin.SIZE / 2);
 
     if (isPageActive) {
-      coords.y += window.pin.MASTER_PIN_SIZE;
-      coords.y += window.pin.MASTER_PIN_PILLAR_SIZE;
+      coords.y += window.pin.MasterPin.SIZE;
+      coords.y += window.pin.MasterPin.PILLAR_HEIGHT;
     } else {
-      coords.y += Math.round(window.pin.MASTER_PIN_SIZE / 2);
+      coords.y += Math.round(window.pin.MasterPin.SIZE / 2);
     }
 
     window.form.setAddress(coords.x + ', ' + coords.y);

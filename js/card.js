@@ -65,7 +65,7 @@ window.card = (function () {
       card.querySelector('.popup__photos').style.display = 'none';
     }
 
-    var accomodationType = window.data.getAccomodationTypeByKey(pinDetails.offer.type);
+    var accomodationType = window.data.accomodationTypeMap[pinDetails.offer.type];
 
     fillOrHideElement(card.querySelector('.popup__title'), pinDetails.offer.title, pinDetails.offer.title);
     fillOrHideElement(card.querySelector('.popup__text--address'), pinDetails.offer.address, pinDetails.offer.address);
