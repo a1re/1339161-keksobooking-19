@@ -77,7 +77,7 @@ window.map = (function () {
     }
   });
 
-  window.data.getPins(placePins);
+  window.data.load(placePins, window.popup.error);
   window.form.setDeactivationCallback(deactivatePage);
   window.form.deactivate();
   filters.deactivate();

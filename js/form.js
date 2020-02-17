@@ -1,7 +1,6 @@
 'use strict';
 
 window.form = (function () {
-  var SAVE_FORM_URL = '//js.dump.academy/keksobooking';
   var SAVE_FORM_LOADING_MESSAGE = 'Публикация...';
   var SAVE_FORM_DEFAULT_MESSAGE = 'Опубликовать';
   var MAX_ROOMS = 100;
@@ -103,32 +102,6 @@ window.form = (function () {
     window.popup.error(message);
   };
 
-  var save = function (data, loadHandler, errorHandler) {
-    var xhr = new XMLHttpRequest();
-    xhr.timeout = window.data.XHR_TIMEOUT_IN_SEC * 1000;
-    xhr.responseType = 'json';
-    xhr.addEventListener('load', function () {
-      switch (xhr.status) {
-        case 200:
-          loadHandler();
-          break;
-
-        default:
-          errorHandler();
-      }
-    });
-    xhr.addEventListener('error', function () {
-      errorHandler();
-    });
-    xhr.addEventListener('timeout', function () {
-      errorHandler('Не удалось сохранить данные за '
-                   + window.data.XHR_TIMEOUT_IN_SEC +
-                   ' сек. Проверьте соединение и перезагрузите страницу.');
-    });
-    xhr.open('POST', SAVE_FORM_URL);
-    xhr.send(data);
-  };
-
   capacitySelector.addEventListener('change', function () {
     if (checkRoomsAndCapacity()) {
       updateFieldValidity(capacitySelector, true);
@@ -169,7 +142,7 @@ window.form = (function () {
   adForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
     adFormSubmitbutton.textContent = SAVE_FORM_LOADING_MESSAGE;
-    save(new FormData(adForm), submitLoadHandler, submitErrorHandler);
+    window.data.save(new FormData(adForm), submitLoadHandler, submitErrorHandler);
   });
 
   adForm.addEventListener('reset', reset);
