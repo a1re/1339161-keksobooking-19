@@ -87,8 +87,8 @@ window.form = (function () {
 
   var getMinPrice = function () {
     var typeValue = typeSelector.value;
-    var accomodationType = window.card.accomodationTypeMap[typeValue];
-    return accomodationType.minPrice;
+    var housingType = window.card.housingTypeMap[typeValue];
+    return housingType.minPrice;
   };
 
   var submitLoadHandler = function () {
