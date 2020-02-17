@@ -1,8 +1,28 @@
 'use strict';
 
 window.card = (function () {
-  var ROOMS_WORDFORMS = ['комната', 'комнаты', 'комнат'];
-  var GUESTS_WORDFORMS = ['гостя', 'гостей', 'гостей'];
+  var Wordform = {
+    ROOMS: ['комната', 'комнаты', 'комнат'],
+    GUESTS: ['гостя', 'гостей', 'гостей']
+  };
+  var accomodationTypeMap = {
+    'palace': {
+      name: 'Дворец',
+      minPrice: 10000
+    },
+    'flat': {
+      name: 'Квартира',
+      minPrice: 1000
+    },
+    'house': {
+      name: 'Дом',
+      minPrice: 5000
+    },
+    'bungalo': {
+      name: 'Бунгало',
+      minPrice: 0
+    }
+  };
 
   var open = function (pinDetails) {
     close();
@@ -27,10 +47,10 @@ window.card = (function () {
 
     var roomsGuests = [];
     if (pinDetails.offer.rooms) {
-      roomsGuests.push(pinDetails.offer.rooms + ' ' + window.util.pickWordByInt(pinDetails.offer.rooms, ROOMS_WORDFORMS));
+      roomsGuests.push(pinDetails.offer.rooms + ' ' + window.util.pickWordByInt(pinDetails.offer.rooms, Wordform.ROOMS));
     }
     if (pinDetails.offer.guests) {
-      roomsGuests.push('для ' + pinDetails.offer.guests + ' ' + window.util.pickWordByInt(pinDetails.offer.guests, GUESTS_WORDFORMS));
+      roomsGuests.push('для ' + pinDetails.offer.guests + ' ' + window.util.pickWordByInt(pinDetails.offer.guests, Wordform.GUESTS));
     }
 
     if (pinDetails.offer.features.length) {
@@ -65,7 +85,7 @@ window.card = (function () {
       card.querySelector('.popup__photos').style.display = 'none';
     }
 
-    var accomodationType = window.data.accomodationTypeMap[pinDetails.offer.type];
+    var accomodationType = accomodationTypeMap[pinDetails.offer.type];
 
     fillOrHideElement(card.querySelector('.popup__title'), pinDetails.offer.title, pinDetails.offer.title);
     fillOrHideElement(card.querySelector('.popup__text--address'), pinDetails.offer.address, pinDetails.offer.address);
@@ -107,7 +127,8 @@ window.card = (function () {
 
   return {
     open: open,
-    close: close
+    close: close,
+    accomodationTypeMap: accomodationTypeMap
   };
 
 })();

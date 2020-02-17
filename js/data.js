@@ -7,24 +7,6 @@ window.data = (function () {
   var StatusCode = {
     SUCCESS: 200
   };
-  var accomodationTypeMap = {
-    'palace': {
-      name: 'Дворец',
-      minPrice: 10000
-    },
-    'flat': {
-      name: 'Квартира',
-      minPrice: 1000
-    },
-    'house': {
-      name: 'Дом',
-      minPrice: 5000
-    },
-    'bungalo': {
-      name: 'Бунгало',
-      minPrice: 0
-    }
-  };
 
   var getPins = function (pinsHandler) {
     var xhr = new XMLHttpRequest();
@@ -55,7 +37,6 @@ window.data = (function () {
 
   return {
     getPins: getPins,
-    accomodationTypeMap: accomodationTypeMap,
     XHR_TIMEOUT_IN_SEC: XHR_TIMEOUT_IN_SEC
   };
 })();
