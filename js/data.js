@@ -1,78 +1,75 @@
 'use strict';
 
 window.data = (function () {
-  var PINS_LIST_URL = '//js.dump.academy/keksobooking/data';
-  var PINS_LOAD_ERROR_MESSAGE = 'Не удалось получить объявления с сервера. Попробуйте перезагрузить страницу';
+  var LOAD_URL = '//js.dump.academy/keksobooking/data';
+  var SAVE_URL = '//js.dump.academy/keksobooking';
   var XHR_TIMEOUT_IN_SEC = 10;
-  var BOUNDARIES = {
-    TOP: 130,
-    RIGHT: document.querySelector('.map').offsetWidth,
-    BOTTOM: 630,
-    LEFT: 0
+  var Message = {
+    ADVICE: 'Проверьте соединение и попробуйте еще раз.',
+    PIN_LOAD_ERROR: 'Не удалось получить объявления с сервера. ',
+    TIMEOUT: 'Не удалось загрузить данные за ' + XHR_TIMEOUT_IN_SEC + ' сек. '
   };
-  var ACCOMODATION_TYPES = [
-    {
-      key: 'palace',
-      name: 'Дворец',
-      minPrice: 10000
-    },
-    {
-      key: 'flat',
-      name: 'Квартира',
-      minPrice: 1000
-    },
-    {
-      key: 'house',
-      name: 'Дом',
-      minPrice: 5000
-    },
-    {
-      key: 'bungalo',
-      name: 'Бунгало',
-      minPrice: 0
-    }
-  ];
-
-  var getAccomodationTypeByKey = function (accomodationKey) {
-    for (var i = 0; i < ACCOMODATION_TYPES.length; i++) {
-      if (ACCOMODATION_TYPES[i].key === accomodationKey) {
-        return ACCOMODATION_TYPES[i];
-      }
-    }
-    return null;
+  var StatusCode = {
+    SUCCESS: 200
   };
 
-  var getPins = function (pinsHandler) {
+  var pins = [];
+
+  var load = function (loadHander, errorHandler) {
     var xhr = new XMLHttpRequest();
     xhr.timeout = XHR_TIMEOUT_IN_SEC * 1000;
     xhr.responseType = 'json';
-    xhr.open('GET', PINS_LIST_URL);
+    xhr.open('GET', LOAD_URL);
     xhr.send();
 
     xhr.addEventListener('load', function () {
       switch (xhr.status) {
-        case 200:
-          pinsHandler(xhr.response);
+        case StatusCode.SUCCESS:
+          window.data.pins = xhr.response;
+          loadHander(window.data.pins);
           break;
 
         default:
-          window.popup.error(PINS_LOAD_ERROR_MESSAGE + ' (cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText + ').');
+          errorHandler(Message.PIN_LOAD_ERROR + ' (cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText + ').');
       }
     });
 
     xhr.addEventListener('error', function () {
-      window.popup.error(PINS_LOAD_ERROR_MESSAGE + '.');
+      errorHandler(Message.PIN_LOAD_ERROR + Message.ADVICE);
     });
 
     xhr.addEventListener('timeout', function () {
-      window.popup.error(PINS_LOAD_ERROR_MESSAGE + ' (таймаут ' + xhr.timeout + ' сек.)');
+      errorHandler(Message.TIMEOUT);
     });
   };
 
+  var save = function (data, loadHandler, errorHandler) {
+    var xhr = new XMLHttpRequest();
+    xhr.timeout = XHR_TIMEOUT_IN_SEC * 1000;
+    xhr.responseType = 'json';
+    xhr.addEventListener('load', function () {
+      switch (xhr.status) {
+        case StatusCode.SUCCESS:
+          loadHandler();
+          break;
+
+        default:
+          errorHandler();
+      }
+    });
+    xhr.addEventListener('error', function () {
+      errorHandler();
+    });
+    xhr.addEventListener('timeout', function () {
+      errorHandler(Message.TIMEOUT);
+    });
+    xhr.open('POST', SAVE_URL);
+    xhr.send(data);
+  };
+
   return {
-    getPins: getPins,
-    getAccomodationTypeByKey: getAccomodationTypeByKey,
-    BOUNDARIES: BOUNDARIES,
-    XHR_TIMEOUT_IN_SEC: XHR_TIMEOUT_IN_SEC
+    load: load,
+    save: save,
+    pins: pins
   };
 })();

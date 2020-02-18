@@ -1,10 +1,20 @@
 'use strict';
 
 window.pin = (function () {
-  var PIN_WIDTH = 50;
-  var PIN_HEIGHT = 70;
-  var MASTER_PIN_SIZE = 65;
-  var MASTER_PIN_PILLAR_SIZE = 20;
+  var Pin = {
+    WIDTH: 50,
+    HEIGHT: 70
+  };
+  var MasterPin = {
+    SIZE: 65,
+    PILLAR_HEIGHT: 20
+  };
+  var Boundary = {
+    TOP: 130,
+    RIGHT: document.querySelector('.map').offsetWidth,
+    BOTTOM: 630,
+    LEFT: 0
+  };
 
   var master = document.querySelector('.map__pin--main');
   var addressUpdateCallback = null;
@@ -13,8 +23,8 @@ window.pin = (function () {
 
   var make = function (pinElement, pinData) {
     var pinImage = pinElement.querySelector('img');
-    pinElement.style.left = pinData.location.x - PIN_WIDTH / 2 + 'px';
-    pinElement.style.top = pinData.location.y - PIN_HEIGHT + 'px';
+    pinElement.style.left = pinData.location.x - Pin.WIDTH / 2 + 'px';
+    pinElement.style.top = pinData.location.y - Pin.HEIGHT + 'px';
     pinImage.src = pinData.author.avatar;
     pinImage.alt = pinData.offer.title;
     return pinElement;
@@ -54,18 +64,18 @@ window.pin = (function () {
         y: moveEvt.clientY
       };
 
-      if (master.offsetLeft - delta.x <= window.data.BOUNDARIES.LEFT) {
-        master.style.left = window.data.BOUNDARIES.LEFT + 'px';
-      } else if (master.offsetLeft - delta.x >= (window.data.BOUNDARIES.RIGHT - MASTER_PIN_SIZE)) {
-        master.style.left = (window.data.BOUNDARIES.RIGHT - MASTER_PIN_SIZE) + 'px';
+      if (master.offsetLeft - delta.x <= Boundary.LEFT) {
+        master.style.left = Boundary.LEFT + 'px';
+      } else if (master.offsetLeft - delta.x >= (Boundary.RIGHT - MasterPin.SIZE)) {
+        master.style.left = (Boundary.RIGHT - MasterPin.SIZE) + 'px';
       } else {
         master.style.left = (master.offsetLeft - delta.x) + 'px';
       }
 
-      if (master.offsetTop - delta.y <= window.data.BOUNDARIES.TOP - MASTER_PIN_SIZE - MASTER_PIN_PILLAR_SIZE) {
-        master.style.top = (window.data.BOUNDARIES.TOP - MASTER_PIN_SIZE - MASTER_PIN_PILLAR_SIZE) + 'px';
-      } else if (master.offsetTop - delta.y >= window.data.BOUNDARIES.BOTTOM - MASTER_PIN_SIZE - MASTER_PIN_PILLAR_SIZE) {
-        master.style.top = (window.data.BOUNDARIES.BOTTOM - MASTER_PIN_SIZE - MASTER_PIN_PILLAR_SIZE) + 'px';
+      if (master.offsetTop - delta.y <= Boundary.TOP - MasterPin.SIZE - MasterPin.PILLAR_HEIGHT) {
+        master.style.top = (Boundary.TOP - MasterPin.SIZE - MasterPin.PILLAR_HEIGHT) + 'px';
+      } else if (master.offsetTop - delta.y >= Boundary.BOTTOM - MasterPin.SIZE - MasterPin.PILLAR_HEIGHT) {
+        master.style.top = (Boundary.BOTTOM - MasterPin.SIZE - MasterPin.PILLAR_HEIGHT) + 'px';
       } else {
         master.style.top = (master.offsetTop - delta.y) + 'px';
       }
@@ -89,8 +99,7 @@ window.pin = (function () {
   master.addEventListener('mousedown', updateMasterPosition);
 
   return {
-    MASTER_PIN_SIZE: MASTER_PIN_SIZE,
-    MASTER_PIN_PILLAR_SIZE: MASTER_PIN_PILLAR_SIZE,
+    MasterPin: MasterPin,
     make: make,
     master: master,
     setAddressUpdateCallback: setAddressUpdateCallback,
