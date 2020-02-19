@@ -1,8 +1,8 @@
 'use strict';
 
 window.data = (function () {
-  var LOAD_URL = '//js.dump.academy/keksobooking/data';
-  var SAVE_URL = '//js.dump.academy/keksobooking';
+  var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
+  var SAVE_URL = 'https://js.dump.academy/keksobooking';
   var XHR_TIMEOUT_IN_SEC = 10;
   var Message = {
     ADVICE: 'Проверьте соединение и попробуйте еще раз.',
