@@ -1,28 +1,6 @@
 'use strict';
 
 window.card = (function () {
-  var Wordform = {
-    ROOMS: ['комната', 'комнаты', 'комнат'],
-    GUESTS: ['гостя', 'гостей', 'гостей']
-  };
-  var housingTypeMap = {
-    'palace': {
-      name: 'Дворец',
-      minPrice: 10000
-    },
-    'flat': {
-      name: 'Квартира',
-      minPrice: 1000
-    },
-    'house': {
-      name: 'Дом',
-      minPrice: 5000
-    },
-    'bungalo': {
-      name: 'Бунгало',
-      minPrice: 0
-    }
-  };
 
   var open = function (pinData) {
     close();
@@ -47,10 +25,10 @@ window.card = (function () {
 
     var roomsGuests = [];
     if (pinData.offer.rooms) {
-      roomsGuests.push(pinData.offer.rooms + ' ' + window.util.pickWordByInt(pinData.offer.rooms, Wordform.ROOMS));
+      roomsGuests.push(pinData.offer.rooms + ' ' + window.util.pickWordByInt(pinData.offer.rooms, window.page.Wordform.ROOMS));
     }
     if (pinData.offer.guests) {
-      roomsGuests.push('для ' + pinData.offer.guests + ' ' + window.util.pickWordByInt(pinData.offer.guests, Wordform.GUESTS));
+      roomsGuests.push('для ' + pinData.offer.guests + ' ' + window.util.pickWordByInt(pinData.offer.guests, window.page.Wordform.GUESTS));
     }
 
     if (pinData.offer.features.length) {
@@ -85,7 +63,7 @@ window.card = (function () {
       card.querySelector('.popup__photos').style.display = 'none';
     }
 
-    var housingType = housingTypeMap[pinData.offer.type];
+    var housingType = window.page.housingTypeMap[pinData.offer.type];
 
     fillOrHideElement(card.querySelector('.popup__title'), pinData.offer.title, pinData.offer.title);
     fillOrHideElement(card.querySelector('.popup__text--address'), pinData.offer.address, pinData.offer.address);
@@ -98,7 +76,9 @@ window.card = (function () {
     card.querySelector('.popup__close').addEventListener('click', function () {
       close();
     });
-    document.addEventListener('keydown', closeByEscHandler);
+    window.util.setCloseByEsc(function () {
+      close();
+    });
 
     mapFilters.parentNode.insertBefore(card, mapFilters);
   };
@@ -107,28 +87,20 @@ window.card = (function () {
     var card = document.querySelector('.map__card');
     if (card) {
       card.remove();
-      document.removeEventListener('keydown', closeByEscHandler);
     }
   };
 
-  var fillOrHideElement = function (node, condition, content) {
+  var fillOrHideElement = function (element, condition, content) {
     if (condition) {
-      node.textContent = content;
+      element.textContent = content;
     } else {
-      node.style.display = 'node';
-    }
-  };
-
-  var closeByEscHandler = function (evt) {
-    if (window.util.isEscPressed(evt)) {
-      close();
+      element.style.display = 'none';
     }
   };
 
   return {
     open: open,
-    close: close,
-    housingTypeMap: housingTypeMap
+    close: close
   };
 
 })();

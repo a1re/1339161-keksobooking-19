@@ -1,11 +1,7 @@
 'use strict';
 
 window.form = (function () {
-  var SAVE_FORM_LOADING_MESSAGE = 'Публикация...';
-  var SAVE_FORM_DEFAULT_MESSAGE = 'Опубликовать';
-  var MAX_ROOMS = 100;
-  var MIN_CAPACITY = 0;
-  var CAPACITY_ERROR_MESSAGE = 'Гостям будет некомфортно';
+  var FILE_EXTENSIONS = ['jpg', 'jpeg', 'png'];
 
   var adForm = document.querySelector('.ad-form');
   var capacitySelector = adForm.querySelector('#capacity');
@@ -16,38 +12,6 @@ window.form = (function () {
   var timeoutSelector = adForm.querySelector('#timeout');
   var adFormSubmitbutton = adForm.querySelector('.ad-form__submit');
 
-  var deactivationCallback = null;
-
-  var deactivate = function () {
-    adForm.classList.add('ad-form--disabled');
-    var fieldsets = adForm.querySelectorAll('.ad-form fieldset');
-    for (var i = 0; i < fieldsets.length; i++) {
-      fieldsets[i].disabled = true;
-    }
-  };
-
-  var activate = function () {
-    adForm.classList.remove('ad-form--disabled');
-    var fieldsets = adForm.querySelectorAll('.ad-form fieldset');
-    for (var i = 0; i < fieldsets.length; i++) {
-      fieldsets[i].disabled = false;
-    }
-  };
-
-  var reset = function () {
-    deactivate();
-    if (typeof deactivationCallback === 'function') {
-      deactivationCallback();
-    }
-    setTimeout(window.pin.resetMasterPosition, 1);
-  };
-
-  var setDeactivationCallback = function (callback) {
-    if (typeof callback === 'function') {
-      deactivationCallback = callback;
-    }
-  };
-
   var setAddress = function (address) {
     adForm.querySelector('#address').value = address;
   };
@@ -55,10 +19,10 @@ window.form = (function () {
   var checkRoomsAndCapacity = function () {
     var roomNumber = parseInt(roomNumberSelector.value, 10);
     var capacity = parseInt(capacitySelector.value, 10);
-    if (roomNumber === MAX_ROOMS && capacity === MIN_CAPACITY) {
+    if (roomNumber === window.page.Limit.MAX_ROOMS && capacity === window.page.Limit.MIN_CAPACITY) {
       return true;
     }
-    if (roomNumber >= capacity && roomNumber !== MAX_ROOMS && capacity !== MIN_CAPACITY) {
+    if (roomNumber >= capacity && roomNumber !== window.page.Limit.MAX_ROOMS && capacity !== window.page.Limit.MIN_CAPACITY) {
       return true;
     }
     return false;
@@ -87,19 +51,47 @@ window.form = (function () {
 
   var getMinPrice = function () {
     var typeValue = typeSelector.value;
-    var housingType = window.card.housingTypeMap[typeValue];
+    var housingType = window.page.housingTypeMap[typeValue];
     return housingType.minPrice;
   };
 
   var submitLoadHandler = function () {
-    adFormSubmitbutton.textContent = SAVE_FORM_DEFAULT_MESSAGE;
-    window.popup.success();
+    adFormSubmitbutton.textContent = window.page.Message.SAVE_FORM_DEFAULT;
+    window.page.showSuccess();
     adForm.reset();
   };
 
   var submitErrorHandler = function (message) {
-    adFormSubmitbutton.textContent = SAVE_FORM_DEFAULT_MESSAGE;
-    window.popup.error(message);
+    adFormSubmitbutton.textContent = window.page.Message.SAVE_FORM_DEFAULT;
+    window.page.showError(message);
+  };
+
+  var setImageForm = function (fileFieldSelector, imageHolderSelector) {
+    var fileChooser = document.querySelector(fileFieldSelector);
+    var previewHolder = document.querySelector(imageHolderSelector);
+
+    fileChooser.addEventListener('change', function () {
+      var file = fileChooser.files[0];
+      var fileName = file.name.toLowerCase();
+
+      var isExtensionValid = FILE_EXTENSIONS.some(function (ext) {
+        return fileName.endsWith(ext);
+      });
+
+      if (isExtensionValid) {
+        var reader = new FileReader();
+
+        reader.addEventListener('load', function () {
+          window.util.removeElements('*', previewHolder);
+
+          var newPreview = document.createElement('img');
+          newPreview.src = reader.result;
+          previewHolder.appendChild(newPreview);
+        });
+
+        reader.readAsDataURL(file);
+      }
+    });
   };
 
   capacitySelector.addEventListener('change', function () {
@@ -107,7 +99,7 @@ window.form = (function () {
       updateFieldValidity(capacitySelector, true);
       updateFieldValidity(roomNumberSelector, true);
     } else {
-      updateFieldValidity(capacitySelector, false, CAPACITY_ERROR_MESSAGE);
+      updateFieldValidity(capacitySelector, false, window.page.Message.CAPACITY_ERROR);
     }
   });
 
@@ -116,7 +108,7 @@ window.form = (function () {
       updateFieldValidity(roomNumberSelector, true);
       updateFieldValidity(capacitySelector, true);
     } else {
-      updateFieldValidity(roomNumberSelector, false, CAPACITY_ERROR_MESSAGE);
+      updateFieldValidity(roomNumberSelector, false, window.page.Message.CAPACITY_ERROR);
     }
   });
 
@@ -141,16 +133,34 @@ window.form = (function () {
 
   adForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
-    adFormSubmitbutton.textContent = SAVE_FORM_LOADING_MESSAGE;
+    adFormSubmitbutton.textContent = window.page.Message.SAVE_FORM_LOADING;
     window.data.save(new FormData(adForm), submitLoadHandler, submitErrorHandler);
   });
 
-  adForm.addEventListener('reset', reset);
+  adForm.addEventListener('reset', function () {
+    window.page.deactivate();
+  });
+
+  window.page.addActivationProcedure(function () {
+    adForm.classList.remove('ad-form--disabled');
+    var fieldsets = adForm.querySelectorAll('.ad-form fieldset');
+    for (var i = 0; i < fieldsets.length; i++) {
+      fieldsets[i].disabled = false;
+    }
+  });
+
+  window.page.addDeactivationProcedure(function () {
+    adForm.classList.add('ad-form--disabled');
+    var fieldsets = adForm.querySelectorAll('.ad-form fieldset');
+    for (var i = 0; i < fieldsets.length; i++) {
+      fieldsets[i].disabled = true;
+    }
+  });
+
+  setImageForm('#avatar', '.ad-form-header__preview');
+  setImageForm('#images', '.ad-form__photo');
 
   return {
-    activate: activate,
-    deactivate: deactivate,
-    setDeactivationCallback: setDeactivationCallback,
     setAddress: setAddress
   };
 })();

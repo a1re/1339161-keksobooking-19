@@ -2,12 +2,7 @@
 
 window.filter = (function () {
   var CANCEL_FILTER_SELECTOR_VALUE = 'any';
-
   var updatePins = null;
-  var PriceBoundary = {
-    LOW: 10000,
-    HIGH: 50000
-  };
   var checkboxFilters = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var selectorFilters = [
     {
@@ -21,11 +16,11 @@ window.filter = (function () {
       filter: function (selectedValue, pinData) {
         switch (selectedValue) {
           case 'middle':
-            return (pinData.offer.price >= PriceBoundary.LOW && pinData.offer.price <= PriceBoundary.HIGH);
+            return (pinData.offer.price >= window.page.PriceDelimiter.LOW && pinData.offer.price <= window.page.PriceDelimiter.HIGH);
           case 'low':
-            return (pinData.offer.price < PriceBoundary.LOW);
+            return (pinData.offer.price < window.page.PriceDelimiter.LOW);
           case 'high':
-            return (pinData.offer.price > PriceBoundary.HIGH);
+            return (pinData.offer.price > window.page.PriceDelimiter.HIGH);
           default:
             return true;
         }
@@ -47,20 +42,6 @@ window.filter = (function () {
   var filtersForm = document.querySelector('.map__filters-container');
 
   var filters = [];
-
-  var deactivate = function () {
-    var fieldsList = document.querySelectorAll('.map__filters select, .map__filters fieldset');
-    fieldsList.forEach(function (field) {
-      field.disabled = true;
-    });
-  };
-
-  var activate = function () {
-    var fieldsList = document.querySelectorAll('.map__filters select, .map__filters fieldset');
-    fieldsList.forEach(function (field) {
-      field.disabled = false;
-    });
-  };
 
   var addPinHandler = function (pinHandler) {
     updatePins = pinHandler;
@@ -124,9 +105,21 @@ window.filter = (function () {
     });
   });
 
+  window.page.addActivationProcedure(function () {
+    var fieldsList = document.querySelectorAll('.map__filters select, .map__filters fieldset');
+    fieldsList.forEach(function (field) {
+      field.disabled = false;
+    });
+  });
+
+  window.page.addDeactivationProcedure(function () {
+    var fieldsList = document.querySelectorAll('.map__filters select, .map__filters fieldset');
+    fieldsList.forEach(function (field) {
+      field.disabled = true;
+    });
+  });
+
   return {
-    deactivate: deactivate,
-    activate: activate,
     addPinHandler: addPinHandler
   };
 })();

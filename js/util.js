@@ -62,6 +62,30 @@ window.util = (function () {
     };
   };
 
+  var setCloseByEsc = function (closeAction) {
+    var closeByEscHandler = function (evt) {
+      if (window.util.isEscPressed(evt)) {
+        closeAction();
+        document.removeEventListener('keydown', closeByEscHandler);
+      }
+    };
+
+    document.addEventListener('keydown', closeByEscHandler);
+  };
+
+  var removeElements = function (filter, parentElement) {
+    if (!filter) {
+      filter = '*';
+    }
+    if (!parentElement) {
+      parentElement = document;
+    }
+    var elementsList = parentElement.querySelectorAll(filter);
+    elementsList.forEach(function (childElement) {
+      childElement.remove();
+    });
+  };
+
   return {
     isEscPressed: function (evt) {
       return (evt.keyCode === ESC_KEYCODE) ? true : false;
@@ -72,10 +96,12 @@ window.util = (function () {
     capitlizeFirstLetter: function (string) {
       return (string.length > 0) ? (string[0].toUpperCase() + string.slice(1)) : '';
     },
+    setCloseByEsc: setCloseByEsc,
     debounce: debounce,
     getNaturalRandom: getNaturalRandom,
     getRandomValueFromArray: getRandomValueFromArray,
     tossArray: tossArray,
-    pickWordByInt: pickWordByInt
+    pickWordByInt: pickWordByInt,
+    removeElements: removeElements
   };
 })();

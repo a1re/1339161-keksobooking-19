@@ -4,11 +4,6 @@ window.data = (function () {
   var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
   var SAVE_URL = 'https://js.dump.academy/keksobooking';
   var XHR_TIMEOUT_IN_SEC = 10;
-  var Message = {
-    ADVICE: 'Проверьте соединение и попробуйте еще раз.',
-    PIN_LOAD_ERROR: 'Не удалось получить объявления с сервера. ',
-    TIMEOUT: 'Не удалось загрузить данные за ' + XHR_TIMEOUT_IN_SEC + ' сек. '
-  };
   var StatusCode = {
     SUCCESS: 200
   };
@@ -30,16 +25,16 @@ window.data = (function () {
           break;
 
         default:
-          errorHandler(Message.PIN_LOAD_ERROR + ' (cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText + ').');
+          errorHandler(window.page.Message.PIN_LOAD_ERROR + ' (cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText + ').');
       }
     });
 
     xhr.addEventListener('error', function () {
-      errorHandler(Message.PIN_LOAD_ERROR + Message.ADVICE);
+      errorHandler(window.page.Message.PIN_LOAD_ERROR + ' ' + window.page.Message.ADVICE);
     });
 
     xhr.addEventListener('timeout', function () {
-      errorHandler(Message.TIMEOUT);
+      errorHandler(window.page.Message.TIMEOUT);
     });
   };
 
@@ -61,7 +56,7 @@ window.data = (function () {
       errorHandler();
     });
     xhr.addEventListener('timeout', function () {
-      errorHandler(Message.TIMEOUT);
+      errorHandler(window.page.Message.TIMEOUT);
     });
     xhr.open('POST', SAVE_URL);
     xhr.send(data);
