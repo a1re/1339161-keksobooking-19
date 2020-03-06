@@ -14,14 +14,15 @@ window.map = (function () {
 
     coords.x += Math.round(window.page.PointerSize.DIAMETER / 2);
 
-    if (!window.page.isActive()) {
+    if (window.page.isActive()) {
       coords.y += window.page.PointerSize.DIAMETER;
       coords.y += window.page.PointerSize.PILLAR;
     } else {
       coords.y += Math.round(window.page.PointerSize.DIAMETER / 2);
     }
-
-    window.form.setAddress(coords.x + ', ' + coords.y);
+    
+    var addressField = document.querySelector('#address');
+    addressField.value = coords.x + ', ' + coords.y;
   };
 
   var updatePointerPosition = function (evt) {
@@ -59,11 +60,13 @@ window.map = (function () {
       var adjustedBottomBoundary = window.page.Boundary.BOTTOM -
                                    window.page.PointerSize.DIAMETER -
                                    window.page.PointerSize.PILLAR;
+      var adjustedLeftBoundary = window.page.Boundary.LEFT -
+                                  Math.round(window.page.PointerSize.DIAMETER/2);
       var adjustedRightBoundary = window.page.Boundary.RIGHT -
-                                  window.page.PointerSize.DIAMETER;
+                                  Math.round(window.page.PointerSize.DIAMETER/2);
 
-      if (pointer.offsetLeft - delta.x <= window.page.Boundary.LEFT) {
-        pointer.style.left = window.page.Boundary.LEFT + 'px';
+      if (pointer.offsetLeft - delta.x <= adjustedLeftBoundary) {
+        pointer.style.left = adjustedLeftBoundary + 'px';
       } else if (pointer.offsetLeft - delta.x >= adjustedRightBoundary) {
         pointer.style.left = adjustedRightBoundary + 'px';
       } else {
