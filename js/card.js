@@ -143,6 +143,10 @@ window.card = (function () {
     if (card) {
       card.remove();
     }
+    var pin = document.querySelector('.map__pin--active');
+    if (pin) {
+      pin.classList.remove('map__pin--active');
+    }
   };
 
   /**
