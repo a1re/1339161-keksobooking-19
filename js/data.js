@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * Модель для обмена данными с внешними источниками с помощью XMLHttpRequest
+ */
+
 window.data = (function () {
   var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
   var SAVE_URL = 'https://js.dump.academy/keksobooking';
@@ -8,9 +12,17 @@ window.data = (function () {
     SUCCESS: 200
   };
 
+  // Массив, в котором хранятся данные об объявоениях, полученных с сервера
   var pins = [];
 
-  var load = function (loadHander, errorHandler) {
+  /**
+   * Подгружает список объявлений с удаленного сервера по LOAD_URL
+   *
+   * @param {function} successHandler - хэндлер обработки успешного запроса
+   * @param {function} errorHandler - хэндлер обработки ошибки
+   * @return {undefined}
+   */
+  var load = function (successHandler, errorHandler) {
     var xhr = new XMLHttpRequest();
     xhr.timeout = XHR_TIMEOUT_IN_SEC * 1000;
     xhr.responseType = 'json';
@@ -21,7 +33,7 @@ window.data = (function () {
       switch (xhr.status) {
         case StatusCode.SUCCESS:
           window.data.pins = xhr.response;
-          loadHander(window.data.pins);
+          successHandler(window.data.pins);
           break;
 
         default:
@@ -38,14 +50,22 @@ window.data = (function () {
     });
   };
 
-  var save = function (data, loadHandler, errorHandler) {
+  /**
+   * Отправлеяет данные объявления на удаленный сервер по SAVE_URL
+   *
+   * @param {FormData} data - объект FormData с данными из формы
+   * @param {function} successHandler - хэндлер обработки успешного запроса
+   * @param {function} errorHandler - хэндлер обработки ошибки
+   * @return {undefined}
+   */
+  var save = function (data, successHandler, errorHandler) {
     var xhr = new XMLHttpRequest();
     xhr.timeout = XHR_TIMEOUT_IN_SEC * 1000;
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
       switch (xhr.status) {
         case StatusCode.SUCCESS:
-          loadHandler();
+          successHandler();
           break;
 
         default:
