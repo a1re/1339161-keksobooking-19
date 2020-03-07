@@ -249,12 +249,16 @@
   </template>
 
   <script type="text/javascript" src="js/util.js"></script>
+  <script type="text/javascript" src="js/form-field.js"></script>
   <script type="text/javascript" src="js/page.js"></script>
   <script type="text/javascript" src="js/data.js"></script>
-  <script type="text/javascript" src="js/filter.js"></script>
   <script type="text/javascript" src="js/card.js"></script>
-  <script type="text/javascript" src="js/form-field.js"></script>
   <script type="text/javascript" src="js/form.js"></script>
   <script type="text/javascript" src="js/map.js"></script>
+  <script type="text/javascript" src="js/filter.js"></script>
+  <script type="text/javascript" defer>
+    // Деактивация страницы при первичной загрузке
+    window.page.deactivate();
+  </script>
 </body>
 </html>
