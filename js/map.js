@@ -44,7 +44,7 @@ window.map = (function () {
    * @param {Event} evt — Объект события, полученное через обработчик события
    * @return {undefined}
    */
-  var updatePointerPosition = function (evt) {
+  var updatePointerPositionHandler = function (evt) {
     evt.preventDefault();
 
     if (!window.util.isMouseLeftPressed(evt)) {
@@ -176,7 +176,7 @@ window.map = (function () {
     image.alt = data.offer.title;
   };
 
-  pointer.addEventListener('mousedown', updatePointerPosition);
+  pointer.addEventListener('mousedown', updatePointerPositionHandler);
 
   // Обработка простого клика на поинтер
   pointer.addEventListener('click', function (evt) {

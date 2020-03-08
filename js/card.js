@@ -54,27 +54,27 @@ window.card = (function () {
 
     if (pinData.offer.features.length) {
       var featureCards = card.querySelectorAll('.popup__features .popup__feature');
-      for (var i = 0; i < featureCards.length; i++) {
-        featureCards[i].style.display = 'none';
-      }
-      for (i = 0; i < pinData.offer.features.length; i++) {
-        card.querySelector('.popup__feature--' + pinData.offer.features[i]).style.display = 'inline-block';
-      }
+      featureCards.forEach(function (featureCard) {
+        featureCard.style.display = 'none';
+      });
+      pinData.offer.features.forEach(function (feature) {
+        card.querySelector('.popup__feature--' + feature).style.display = 'inline-block';
+      });
     } else {
       card.querySelector('.popup__features').style.display = 'none';
     }
 
     if (pinData.offer.photos.length) {
       var photosFragment = document.createDocumentFragment();
-      for (i = 0; i < pinData.offer.photos.length; i++) {
+      pinData.offer.photos.forEach(function (photo) {
         var photoElement = document.createElement('img');
-        photoElement.src = pinData.offer.photos[i];
+        photoElement.src = photo;
         photoElement.width = 45;
         photoElement.height = 40;
         photoElement.alt = pinData.offer.title;
         photoElement.classList.add('popup__photo');
         photosFragment.appendChild(photoElement);
-      }
+      });
       var currentPhotos = card.querySelector('.popup__photos');
       while (currentPhotos.firstChild) {
         currentPhotos.removeChild(currentPhotos.firstChild);
