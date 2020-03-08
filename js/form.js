@@ -4,11 +4,17 @@
  * Модуль управления полями формы добавления объявления. Поля управляются
  * с помощью объекта window.FormField и его методов.
  *
- * Важный комментарий по ESLint — чтобы не передавать в функции фильтрации
- * объект, для получения доступа к его свойствами и атрибутам используется
- * this. ESLint это не нравится, но лишние данные гонять через параметры
- * функции интутивно кажется еще хуже. Поэтому для строчек с this использутеся
- * комментарий "// eslint-disable-line no-invalid-this" который глушит ESLint.
+ * Важный комментарий по ESLint — у него есть один из критериев валидации,
+ * который вызывает ошибку "Unexpected 'this'" -- по всей видимости, в отношении
+ * функций, которые объяалены вне конструктора и прототипа. Это не дает
+ * возможности создавать функции вне объекта и потом вызывать их в его окружении
+ * с помощью bind. В модуле Form у меня подразумевалась именно такой
+ * подход в отношении функций валидации. Локально я заглушил ESLint для этой
+ * ошибки с помощью комментарий "// eslint-disable-line no-invalid-this",
+ * однако интерфейс htmlacademy.ru игнорирует эту директиву и не дает послать
+ * проект с такой конструкцией. Из-за этого мне пришлось усложнять код
+ * и передавать объект дополнительным параметром функции, что ухудшило
+ * читаемость.
  */
 
 (function () {
@@ -49,8 +55,8 @@
   // Добавление валидации к полю "Тип жилья". Функция всегда возвращает true,
   // но при смене значения обновляет минимальное значение и плейсхолдер для
   // поля цены
-  fields['type'].setValidation(function () {
-    var housingType = window.page.housingTypeMap[this.element.value]; // eslint-disable-line no-invalid-this
+  fields['type'].setValidation(function (field) {
+    var housingType = window.page.housingTypeMap[field.element.value];
     fields['price'].element.min = housingType.minPrice;
     fields['price'].element.placeholder = housingType.minPrice;
     fields['price'].validate();
@@ -60,21 +66,21 @@
   // Добавление валидации к полю "Количество комнат". При изменениии значения
   // проверяет соответствие полю "Количество мест" и сразу отмечает поле
   // невалидным, если оно не соответствует
-  fields['roomNumber'].setValidation(function () {
+  fields['roomNumber'].setValidation(function (field) {
     if (checkRoomsAndCapacity()) {
       return fields['capacity'].setValid();
     }
-    return this.setInvalid(window.page.Message.CAPACITY_ERROR); // eslint-disable-line no-invalid-this
+    return field.setInvalid(window.page.Message.CAPACITY_ERROR);
   });
 
   // Добавление валидации к полю "Количество мест". При изменениии значения
   // проверяет соответствие полю "Количество комнат" и сразу отмечает поле
   // невалидным, если оно не соответствует
-  fields['capacity'].setValidation(function () {
+  fields['capacity'].setValidation(function (field) {
     if (checkRoomsAndCapacity()) {
       return fields['roomNumber'].setValid();
     }
-    return this.setInvalid(window.page.Message.CAPACITY_ERROR); // eslint-disable-line no-invalid-this
+    return field.setInvalid(window.page.Message.CAPACITY_ERROR);
   });
 
   // Добавление валидации к полю "Время заезда". Функция всегда возвращает true,

@@ -4,12 +4,6 @@
  * Абстрактный объект для работы с полями формы объявления. Создается через
  * конструктор Field (снаружи модуля — window.FormField) и настраивается
  * при помощи методов, определенных через прототип.
- *
- * Важный комментарий по ESLint — чтобы не передавать в функции фильтрации
- * объект, для получения доступа к его свойствами и атрибутам используется
- * this. ESLint это не нравится, но лишние данные гонять через параметры
- * функции интутивно кажется еще хуже. Поэтому для строчек с this использутеся
- * комментарий "// eslint-disable-line no-invalid-this" который глушит ESLint.
  */
 
 window.FormField = (function () {
@@ -53,15 +47,16 @@ window.FormField = (function () {
   /**
    * Добавляет функцию валидации к полю
    *
-   * @param {function} procedure - функция, валидирующая значение поля. Доступ
-   *                               к свойствам поля осуществляется через this.
-   *                               Функция должна возвращать логическое (bool)
-   *                               значение: если True, то значение прошло
-   *                               проверку, если False — то нет
+   * @param {function} procedure - функция, валидирующая значение поля. Функции
+   *                               передается аргумент в виде объекта для
+   *                               доступа к свойствам и атрибутам. Функция
+   *                               должна возвращать логическое (bool) значние:
+   *                               если True, то значение прошло проверку,
+   *                               если False — то нет
    * @return {undefined}
    */
   Field.prototype.setValidation = function (procedure) {
-    this.validationProcedure = procedure.bind(this);
+    this.validationProcedure = procedure;
   };
 
   /**
@@ -75,7 +70,7 @@ window.FormField = (function () {
    */
   Field.prototype.validate = function (getStatusOnly) {
     if (typeof this.validationProcedure === 'function') {
-      this.isValid = this.validationProcedure();
+      this.isValid = this.validationProcedure(this);
     } else {
       this.isValid = this.element.validity.valid;
     }
@@ -175,8 +170,8 @@ window.FormField = (function () {
       defaultPreview.appendChild(child);
     });
 
-    var uploadPreviewImageHandler = function () {
-      var file = this.element.files[0]; // eslint-disable-line no-invalid-this
+    var uploadPreviewImageHandler = function (evt) {
+      var file = evt.currentTarget.files[0];
       var fileName = file.name.toLowerCase();
 
       var isExtensionValid = FILE_EXTENSIONS.some(function (ext) {
@@ -198,7 +193,7 @@ window.FormField = (function () {
       }
     };
 
-    this.element.addEventListener('change', uploadPreviewImageHandler.bind(this));
+    this.element.addEventListener('change', uploadPreviewImageHandler);
 
     this.setReset(function () {
       window.util.removeElements('*', previewHolder);

@@ -16,11 +16,20 @@
  * остается в массиве, как только выходит False — перечисление фильтров
  * останавливается, объявление исключается и цикл переходит к след. объявлению.
  *
- * Важный комментарий по ESLint — чтобы не передавать в функции фильтрации
- * объект, для получения доступа к его свойствами и атрибутам используется
- * this. ESLint это не нравится, но лишние данные гонять через параметры
- * функции интутивно кажется еще хуже. Поэтому для строчек с this использутеся
- * комментарий "// eslint-disable-line no-invalid-this" который глушит ESLint.
+ * Важный комментарий по ESLint — у него есть один из критериев валидации,
+ * который вызывает ошибку "Unexpected 'this'" -- по всей видимости, в отношении
+ * функций, которые объяалены вне конструктора и прототипа. Это не дает
+ * возможности создавать функции вне объекта и потом вызывать их в его окружении
+ * с помощью bind. В модуле filter у меня подразумевалась именно такой
+ * подход в отношении функций фильтрации. Локально я заглушил ESLint для этой
+ * ошибки с помощью комментарий "// eslint-disable-line no-invalid-this",
+ * однако интерфейс htmlacademy.ru игнорирует эту директиву и не дает послать
+ * проект с такой конструкцией. Из-за этого мне пришлось усложнять код
+ * и передавать объект дополнительным параметром функции, что ухудшило
+ * читаемость и заставило писать, к примеру:
+ *          filters[key].execute(filters[key].element, pinData)
+ * Вместо куда более изящного:
+ *          filters[key].execute(pinData)
  */
 
 (function () {
@@ -55,12 +64,11 @@
    * @param {function} procedure - функция, котрая вызывается при переборе
    *                               объявлений и должна возвращать True, если
    *                               объявление нужно оставить и False — если
-   *                               нет. Доступ к атрибутам поля осуществляется
-   *                               через this
+   *                               нет.
    * @return {undefined}
    */
   Filter.prototype.set = function (procedure) {
-    this.execute = procedure.bind(this);
+    this.execute = procedure;
   };
 
   /**
@@ -93,7 +101,7 @@
     var filteredPins = window.data.pins.filter(function (pinData) {
       for (var key in filters) {
         if (filters.hasOwnProperty(key)) {
-          if (filters[key].isActive && !filters[key].execute(pinData)) {
+          if (filters[key].isActive && !filters[key].execute(filters[key].element, pinData)) {
             return false;
           }
         }
@@ -127,26 +135,27 @@
    * есть имя поля чекбокса, то возвращает True, оставляя объявление в массиве
    * пинов.
    *
+   * @param {HTMLElement} element - элемент формы, к которому применен объект
    * @param {object} pinData — объект со всей информафией об объявлении,
    *                           полученный со внешнего источника через
    *                           window.data.load
    * @return {bool} True если в массиве offer.features есть элемент с именем
    *                поля, False — если нет
    */
-  var checkboxFilter = function (pinData) {
-    return pinData.offer.features.indexOf(this.element.value) >= 0; // eslint-disable-line no-invalid-this
+  var checkboxFilter = function (element, pinData) {
+    return pinData.offer.features.indexOf(element.value) >= 0;
   };
 
   // Добавление функции фильтрации для поля типа жилья. Сравнивает значение
   // селектора со значением offer.type в объекте информации об объявлении.
-  filters['housingType'].set(function (pinData) {
-    return this.element.value === pinData.offer.type; // eslint-disable-line no-invalid-this
+  filters['housingType'].set(function (element, pinData) {
+    return element.value === pinData.offer.type;
   });
 
   // Добавление функции фильтрации для поля стоимости жилья. Сравнивает значение
   // селектора со значением offer.price через перечислений границ стоиомости.
-  filters['housingPrice'].set(function (pinData) {
-    switch (this.element.value) { // eslint-disable-line no-invalid-this
+  filters['housingPrice'].set(function (element, pinData) {
+    switch (element.value) {
       case 'middle':
         return (
           pinData.offer.price >= window.page.PriceDelimiter.LOW
@@ -165,14 +174,14 @@
   // Добавление функции фильтрации для поля количества комнат. Сравнивает
   // значение селектора со значением offer.rooms в объекте информации
   // об объявлении.
-  filters['housingRooms'].set(function (pinData) {
-    return parseInt(this.element.value, 10) === parseInt(pinData.offer.rooms, 10); // eslint-disable-line no-invalid-this
+  filters['housingRooms'].set(function (element, pinData) {
+    return parseInt(element.value, 10) === parseInt(pinData.offer.rooms, 10);
   });
 
   // Добавление функции фильтрации для поля вместимсти. Сравнивает значение
   // селектора со значением offer.rooms в объекте информации об объявлении.
-  filters['housingGuests'].set(function (pinData) {
-    return parseInt(this.element.value, 10) === parseInt(pinData.offer.guests, 10); // eslint-disable-line no-invalid-this
+  filters['housingGuests'].set(function (element, pinData) {
+    return parseInt(element.value, 10) === parseInt(pinData.offer.guests, 10);
   });
 
   // Добавление функции фильтрации для чекбоксов.
