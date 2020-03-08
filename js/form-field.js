@@ -4,6 +4,12 @@
  * Абстрактный объект для работы с полями формы объявления. Создается через
  * конструктор Field (снаружи модуля — window.FormField) и настраивается
  * при помощи методов, определенных через прототип.
+ *
+ * Важный комментарий по ESLint — чтобы не передавать в функции фильтрации
+ * объект, для получения доступа к его свойствами и атрибутам используется
+ * this. ESLint это не нравится, но лишние данные гонять через параметры
+ * функции интутивно кажется еще хуже. Поэтому для строчек с this использутеся
+ * комментарий "// eslint-disable-line no-invalid-this" который глушит ESLint.
  */
 
 window.FormField = (function () {
@@ -170,7 +176,7 @@ window.FormField = (function () {
     });
 
     var uploadPreviewImageHandler = function () {
-      var file = this.element.files[0];
+      var file = this.element.files[0]; // eslint-disable-line no-invalid-this
       var fileName = file.name.toLowerCase();
 
       var isExtensionValid = FILE_EXTENSIONS.some(function (ext) {

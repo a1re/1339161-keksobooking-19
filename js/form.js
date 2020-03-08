@@ -3,6 +3,12 @@
 /**
  * Модуль управления полями формы добавления объявления. Поля управляются
  * с помощью объекта window.FormField и его методов.
+ *
+ * Важный комментарий по ESLint — чтобы не передавать в функции фильтрации
+ * объект, для получения доступа к его свойствами и атрибутам используется
+ * this. ESLint это не нравится, но лишние данные гонять через параметры
+ * функции интутивно кажется еще хуже. Поэтому для строчек с this использутеся
+ * комментарий "// eslint-disable-line no-invalid-this" который глушит ESLint.
  */
 
 (function () {
@@ -44,7 +50,7 @@
   // но при смене значения обновляет минимальное значение и плейсхолдер для
   // поля цены
   fields['type'].setValidation(function () {
-    var housingType = window.page.housingTypeMap[this.element.value];
+    var housingType = window.page.housingTypeMap[this.element.value]; // eslint-disable-line no-invalid-this
     fields['price'].element.min = housingType.minPrice;
     fields['price'].element.placeholder = housingType.minPrice;
     fields['price'].validate();
@@ -58,7 +64,7 @@
     if (checkRoomsAndCapacity()) {
       return fields['capacity'].setValid();
     }
-    return this.setInvalid(window.page.Message.CAPACITY_ERROR);
+    return this.setInvalid(window.page.Message.CAPACITY_ERROR); // eslint-disable-line no-invalid-this
   });
 
   // Добавление валидации к полю "Количество мест". При изменениии значения
@@ -68,7 +74,7 @@
     if (checkRoomsAndCapacity()) {
       return fields['roomNumber'].setValid();
     }
-    return this.setInvalid(window.page.Message.CAPACITY_ERROR);
+    return this.setInvalid(window.page.Message.CAPACITY_ERROR); // eslint-disable-line no-invalid-this
   });
 
   // Добавление валидации к полю "Время заезда". Функция всегда возвращает true,

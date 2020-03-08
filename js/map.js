@@ -198,9 +198,8 @@ window.map = (function () {
   window.page.addActivationProcedure(function () {
     window.data.load(updatePins, window.page.showError);
   });
-//  window.filter.addPinHandler(window.util.debounce(updatePins));
-  
+
   return {
     updatePins: window.util.debounce(updatePins)
-  }
+  };
 })();

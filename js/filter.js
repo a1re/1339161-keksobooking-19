@@ -15,6 +15,12 @@
  * активированные функции фильтров. Пока функции возвращают True, объявление
  * остается в массиве, как только выходит False — перечисление фильтров
  * останавливается, объявление исключается и цикл переходит к след. объявлению.
+ *
+ * Важный комментарий по ESLint — чтобы не передавать в функции фильтрации
+ * объект, для получения доступа к его свойствами и атрибутам используется
+ * this. ESLint это не нравится, но лишние данные гонять через параметры
+ * функции интутивно кажется еще хуже. Поэтому для строчек с this использутеся
+ * комментарий "// eslint-disable-line no-invalid-this" который глушит ESLint.
  */
 
 (function () {
@@ -32,7 +38,7 @@
     self.element = document.querySelector(selector);
     self.isActive = false;
     self.element.addEventListener('change', function () {
-      var unchecked = (self.element.type === "checkbox" && self.element.checked == false);
+      var unchecked = (self.element.type === 'checkbox' && self.element.checked === false);
       var selectedAny = (self.element.value === CANCEL_FILTER_SELECTOR_VALUE);
       if (unchecked || selectedAny) {
         self.deactivate();
@@ -42,7 +48,7 @@
       updateData();
     });
   };
-  
+
   /**
    * Добавляет функцию фильтрации к полю
    *
@@ -64,7 +70,7 @@
    * @return {undefined}
    */
   Filter.prototype.activate = function () {
-    this.isActive = true;    
+    this.isActive = true;
   };
 
   /**
@@ -74,7 +80,7 @@
    * @return {undefined}
    */
   Filter.prototype.deactivate = function () {
-    this.isActive = false;    
+    this.isActive = false;
   };
 
   /**
@@ -86,17 +92,23 @@
   var applyFilters = function () {
     var filteredPins = window.data.pins.filter(function (pinData) {
       for (var key in filters) {
-        if (filters[key].isActive && !filters[key].execute(pinData)) {
-          return false;
+        if (filters.hasOwnProperty(key)) {
+          if (filters[key].isActive && !filters[key].execute(pinData)) {
+            return false;
+          }
         }
       }
       return true;
     });
     window.map.updatePins(filteredPins);
   };
-  
+
   // Создаем словарь со списком объектов, где ключ — название поля. Поля
-  // создаются по DOM-селектору.
+  // создаются по DOM-селектору. Т.к. создание объектов однотипное, очень
+  // просится селекторы загнать в массив, а объекты создавать в цикле, но
+  // на практике это только создает лишние переменные и циклы, но никак
+  // не экономит объем кода и заметно ухудшает читаемость. Хоть это и
+  // немного противоречит DRY, это осознанное решение.
   var filters = {
     'housingType': new Filter('#housing-type', applyFilters),
     'housingPrice': new Filter('#housing-price', applyFilters),
@@ -109,7 +121,7 @@
     'filterElevator': new Filter('#filter-elevator', applyFilters),
     'filterConditioner': new Filter('#filter-conditioner', applyFilters)
   };
-  
+
   /**
    * Универсальная функция-фильтрациии для всех чекбоксов. Если в списке удобств
    * есть имя поля чекбокса, то возвращает True, оставляя объявление в массиве
@@ -122,19 +134,19 @@
    *                поля, False — если нет
    */
   var checkboxFilter = function (pinData) {
-    return pinData.offer.features.indexOf(this.element.value) >= 0;
+    return pinData.offer.features.indexOf(this.element.value) >= 0; // eslint-disable-line no-invalid-this
   };
-  
+
   // Добавление функции фильтрации для поля типа жилья. Сравнивает значение
   // селектора со значением offer.type в объекте информации об объявлении.
   filters['housingType'].set(function (pinData) {
-    return this.element.value === pinData.offer.type;
+    return this.element.value === pinData.offer.type; // eslint-disable-line no-invalid-this
   });
-  
+
   // Добавление функции фильтрации для поля стоимости жилья. Сравнивает значение
-  // селектора со значением offer.price через перечислений границ стоиомости. 
+  // селектора со значением offer.price через перечислений границ стоиомости.
   filters['housingPrice'].set(function (pinData) {
-    switch (this.element.value) {
+    switch (this.element.value) { // eslint-disable-line no-invalid-this
       case 'middle':
         return (
           pinData.offer.price >= window.page.PriceDelimiter.LOW
@@ -149,20 +161,20 @@
         return true;
     }
   });
-  
+
   // Добавление функции фильтрации для поля количества комнат. Сравнивает
   // значение селектора со значением offer.rooms в объекте информации
   // об объявлении.
   filters['housingRooms'].set(function (pinData) {
-    return parseInt(this.element.value, 10) === parseInt(pinData.offer.rooms, 10);
+    return parseInt(this.element.value, 10) === parseInt(pinData.offer.rooms, 10); // eslint-disable-line no-invalid-this
   });
-  
+
   // Добавление функции фильтрации для поля вместимсти. Сравнивает значение
   // селектора со значением offer.rooms в объекте информации об объявлении.
   filters['housingGuests'].set(function (pinData) {
-    return parseInt(this.element.value, 10) === parseInt(pinData.offer.guests, 10);
+    return parseInt(this.element.value, 10) === parseInt(pinData.offer.guests, 10); // eslint-disable-line no-invalid-this
   });
-  
+
   // Добавление функции фильтрации для чекбоксов.
   filters['filterWifi'].set(checkboxFilter);
   filters['filterDishwasher'].set(checkboxFilter);
@@ -174,7 +186,9 @@
   // Снятие атрибутов disabled для всех полей при активации страницы
   window.page.addActivationProcedure(function () {
     for (var key in filters) {
-      filters[key].element.disabled = false;
+      if (filters.hasOwnProperty(key)) {
+        filters[key].element.disabled = false;
+      }
     }
   });
 
@@ -183,8 +197,10 @@
   window.page.addDeactivationProcedure(function () {
     var form = document.querySelector('.map__filters');
     for (var key in filters) {
-      filters[key].element.disabled = true;
-      filters[key].deactivate();
+      if (filters.hasOwnProperty(key)) {
+        filters[key].element.disabled = true;
+        filters[key].deactivate();
+      }
     }
     form.reset();
   });
